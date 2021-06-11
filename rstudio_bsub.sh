@@ -130,7 +130,7 @@ case "$1" in
     LSF_CONF=/usr/local/lsf/conf/lsbatch/farm5/configdir/lsb.users
     UNIX_USER=$(id -un)
 
-    USER_GROUPS=$(cat $LSF_CONF | grep $UNIX_USER) || \
+    USER_GROUPS=$(cat $LSF_CONF | grep $UNIX_USER | grep default | grep -v '^#') || \
 	(echo "Error: the user $UNIX_USER does not seem to be any LSF group as listed in ${LSF_CONF} . Contact HGI (hgi@sanger.ac.usk)" && exit 1)
     
     # assign lsf group
@@ -141,7 +141,7 @@ case "$1" in
           then
             echo "\$LSB_DEFAULTGROUP is empty"
 	    # because LSF_GROUP not specified, and $LSB_DEFAULTGROUP is empty, assign random group from lsf conf file  
-	    export LSF_GROUP=$(cat $LSF_CONF | grep $UNIX_USER | head -n 1 |cut -f1 -d " ")
+	    export LSF_GROUP=$(cat $LSF_CONF | grep $UNIX_USER | grep default | grep -v '^#' | head -n 1 |cut -f1 -d " ")
 	    echo "assigning random lsf group for user $UNIX_USER from lsf config file $LSF_CONF : $LSF_GROUP"
           else
             echo "\$LSB_DEFAULTGROUP not empty, therefore setting \$LSF_GROUP to \$LSB_DEFAULTGROUP"
@@ -151,7 +151,7 @@ case "$1" in
     echo LSF_GROUP is $LSF_GROUP
     
     # check lsf group exists and matches user
-    USER_GROUPS=$(cat $LSF_CONF | grep $UNIX_USER | grep $LSF_GROUP) || \
+    USER_GROUPS=$(cat $LSF_CONF | grep $UNIX_USER | grep -v '^#' | grep $LSF_GROUP) || \
 	(echo "Error: the user $UNIX_USER does not seem to be in LSF group $LSF_GROUP according to list ${LSF_CONF} . Contact HGI (hgi@sanger.ac.usk)" && exit 1)
     
 
