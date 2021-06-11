@@ -178,7 +178,7 @@ case "$1" in
 	 -e rstudio_session.log \
 	 -q $QUEUE \
 	 -J "bsub rstudio user $UNIX_USER" \
-	 bash start_rstudio_node_rserver.sh \
+	 bash rstudio_node_rserver.sh \
 	 --r_version $R_VERSION \
 	 --cpus $N_CPUS \
 	 --dir_session $SESSION_DIRECTORY \
