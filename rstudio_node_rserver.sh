@@ -83,8 +83,8 @@ echo EXTRA_RSERVER_ARGUMENTS is set to $EXTRA_RSERVER_ARGUMENTS
 ## 
 
 
-export PORT=38820
-export SINGULARITYENV_PASSWORD=pa01
+#export PORT=38820
+#export SINGULARITYENV_PASSWORD=pa01
 echo "temporary writable work directory for the singularity container is set to $workdir"
 echo SESSION_DIRECTORY is set to $SESSION_DIRECTORY
 echo SINGULARITY_BIND is set to $SINGULARITY_BIND
