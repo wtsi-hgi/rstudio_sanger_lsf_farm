@@ -33,7 +33,6 @@ export R_CONTAINER_EXECUTABLE=/usr/local/bin/R
 # add latest singularity exec to PATH:
 export PATH=/software/singularity-v3.6.4/bin:$PATH
     
-    
 # set .libPaths() for container R session:
 if [ -z "$R_LIBS_USER" ]
 then
@@ -49,8 +48,12 @@ else
 	export CONTAINER_R_LIBS_USER=${R_LIBS_USER}:/software/R-$R_VERSION/lib/R/library
     fi   
 fi
+# if r lib path specified as input argument, prepend to container R_LIBS_USER
+if [ ! -z "${CUSTOM_R_LIBPATH}" ]
+  then
+    export CONTAINER_R_LIBS_USER=${CUSTOM_R_LIBPATH}:${CONTAINER_R_LIBS_USER}
+fi
 echo "CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
-
 
 # Create temporary directory to be populated with directories to bind-mount in the container
 # where writable file systems are necessary. Adjust path as appropriate for your computing environment.
