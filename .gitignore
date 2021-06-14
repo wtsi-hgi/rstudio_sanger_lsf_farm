@@ -1,3 +1,7 @@
+rstudio_session.log
+.local
+.config
+
 # History files
 .Rhistory
 .Rapp.history
