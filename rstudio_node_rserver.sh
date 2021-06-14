@@ -292,7 +292,7 @@ case "$1" in
     # start main script (which is supposed to run within bsub on Sanger LSF farm):
     start_rserver
 
-     exit 1
-     ;;
+    exit 0
+    ;;
 esac
 
