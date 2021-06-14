@@ -10,7 +10,7 @@ set -e # exit when any command fails
 display_help() {
     echo "Usage: $0 [options...]" >&2
     echo
-    echo "  -l, --lsf_group         (optional) LSF group (bsub -G argument)"
+    echo "  -g, --lsf_group         (optional) LSF group (bsub -G argument)"
     echo "                          - defaults to \$LSB_DEFAULTGROUP if set, or tries to find your group(s) from lsb.users lsf config"
     echo "  -m, --mem               (optional) RAM memory requested to LSF farm for Rstudio session"
     echo "                          - enter a value in Mb (i.e. \"15000\" to get 15Gb)"
@@ -61,7 +61,7 @@ do
           display_help
           exit 1 
           ;;
-      -l | --lsf_group)
+      -g | --lsf_group)
           export LSF_GROUP=$2
           shift 2
           ;;
