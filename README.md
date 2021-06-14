@@ -11,7 +11,7 @@ If you are a new farm user, please consider reading first [HGI's software docume
 
 Log into the Sanger farm, run the `./rstudio_bsub.sh` script to start Rstudio, and copy-paste the provided URL and password in your web browser for access.
   
-All script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):parameters 
+All script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):
 
 ```
 ./rstudio_bsub.sh help
