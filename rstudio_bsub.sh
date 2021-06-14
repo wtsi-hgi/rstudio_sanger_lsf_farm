@@ -81,6 +81,10 @@ do
           export R_VERSION=$2  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
           shift 2
           ;;
+      -l | --r_lib_path)
+	  export CUSTOM_R_LIBPATH=$2
+          shift 2
+          ;;
       -d | --dir_session)
 	  export SESSION_DIRECTORY=$2
           shift 2
@@ -123,7 +127,6 @@ case "$1" in
     export MEM="${MEM:-15000}"
     export N_CPUS="${N_CPUS:-2}"
     export QUEUE="${QUEUE:-normal}"
-
 
     # find LSF group for bsub -G argument
     # first, check available lsf groups from lsf config file:
@@ -168,6 +171,7 @@ case "$1" in
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
     export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-rocker_tidyverse_$R_VERSION.simg}" 
+    export CUSTOM_R_LIBPATH="${CUSTOM_R_LIBPATH:-}" # leave empty by default 
 
     
     printf "\nstarting bsub... \n"
