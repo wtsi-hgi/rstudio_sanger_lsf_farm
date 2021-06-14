@@ -190,6 +190,10 @@ do
 	  export SESSION_DIRECTORY=$2
           shift 2
           ;;
+      -l | --r_lib_path)
+	  export CUSTOM_R_LIBPATH=$2
+          shift 2
+          ;;
       -a | --dir_singularity)
 	  export SINGULARITY_CACHE_DIR=$2 #  /software/hgi/containers
           shift 2
