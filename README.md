@@ -2,7 +2,7 @@
   
 Bash script to start (bsub) an Rstudio server on Sanger LSF farm, with access to `/lustre`, via web browser.
 
-If you are a new farm user, please consider first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
+If you are a new farm user, please consider reading first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
 - set HGI's software profile in order to set your personal R user library search path
 - instructions on how to install your own libraries in that personal directory.
 
