@@ -282,7 +282,7 @@ case "$1" in
       then
         if [ ! -r "${CUSTOM_R_LIBPATH}" ]
           then
-            echo "Error: custom library lib path is not readable. Please choose a --r_lib_path (or -l) directory that contain R libraries"
+            echo "Error: custom library lib path is not readable. Please choose a --r_lib_path (or -l) directory that exists and contains R libraries."
             exit 1
         fi
     fi
