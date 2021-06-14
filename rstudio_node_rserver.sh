@@ -26,7 +26,7 @@ echo "therefore, CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
 
 # Create temporary directory to be populated with directories to bind-mount in the container
 # where writable file systems are necessary. Adjust path as appropriate for your computing environment.
-workdir=$(python -c 'import tempfile; print(tempfile.mkdtemp())')
+workdir="$(mktemp -d)" # workdir=$(python -c 'import tempfile; print(tempfile.mkdtemp())')
 
 mkdir -p -m 700 ${workdir}/run ${workdir}/tmp ${workdir}/var/lib/rstudio-server
 cat > ${workdir}/database.conf <<END
