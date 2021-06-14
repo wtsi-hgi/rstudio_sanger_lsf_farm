@@ -15,11 +15,17 @@ start_rserver() {
 # set .libPaths() for container R session:
 if [ -z "$R_LIBS_USER" ]
 then
-      echo "R_LIBS_USER is empty"
-      export CONTAINER_R_LIBS_USER=/software/R-$R_VERSION/lib/R/library
+    echo "R_LIBS_USER is empty"
+    export CONTAINER_R_LIBS_USER=/software/R-$R_VERSION/lib/R/library
 else
-      echo "R_LIBS_USER is NOT empty"
-      export CONTAINER_R_LIBS_USER=$R_LIBS_USER:/software/R-$R_VERSION/lib/R/library
+    echo "R_LIBS_USER is NOT empty"
+    if [[ "$R_LIBS_USER" =~ ':'$ ]]; then
+	echo "R_LIBS_USER has trailing colon: $R_LIBS_USER"
+        export CONTAINER_R_LIBS_USER=${R_LIBS_USER}/software/R-$R_VERSION/lib/R/library
+    else
+	echo "R_LIBS_USER doesn't have trailing colon: $R_LIBS_USER"
+	export CONTAINER_R_LIBS_USER=${R_LIBS_USER}:/software/R-$R_VERSION/lib/R/library
+    fi   
 fi
 echo "therefore, CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
 
