@@ -278,12 +278,13 @@ case "$1" in
         exit 1
     fi
     # check that custom R libpath directory exists, if specified as input argument
-    if [ ! -z "${CUSTOM_R_LIBPATH}" ];
-      if [ ! -r "${CUSTOM_R_LIBPATH}" ]
-        then
-          echo "Error: custom library lib path is not readable. Please choose a --r_lib_path (or -l) directory that contain R libraries"
-          exit 1
-      fi
+    if [ ! -z "${CUSTOM_R_LIBPATH}" ]
+      then
+        if [ ! -r "${CUSTOM_R_LIBPATH}" ]
+          then
+            echo "Error: custom library lib path is not readable. Please choose a --r_lib_path (or -l) directory that contain R libraries"
+            exit 1
+        fi
     fi
     
     #####################
