@@ -7,7 +7,9 @@ If you are a new farm user, please consider reading first [HGI's software docume
 - instructions on how to install your own libraries in that personal directory.
 
 
-# run the `./rstudio_bsub.sh` script to start rstudio, then copy-paste the URL and passowrd in your web browser for access.
+#### start Rstudio
+
+Run the `./rstudio_bsub.sh` script to start rstudio, then copy-paste the URL and passowrd in your web browser for access.
   
 All script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):parameters 
 
