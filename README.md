@@ -1,6 +1,6 @@
 ### Rstudio server on Sanger LSF farm
   
-This repository provides a bash script to start (bsub) an Rstudio server on Sanger LSF farm, with access to `/lustre`, `/nfs` and `/software`, with optional arguments such as R version or R personal library paths.
+This repository provides a bash script to start (bsub) an Rstudio server on the Sanger LSF farm, with access to `/lustre`, `/nfs` and `/software`, with optional arguments such as R version or R personal library paths.
 
 If you are a new farm user, please consider reading first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
 - set HGI's software profile in order to set your personal default R user library search path (`echo "hgi" >> ~/.softwarerc`).
