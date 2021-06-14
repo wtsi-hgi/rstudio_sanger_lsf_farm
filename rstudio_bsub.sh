@@ -191,6 +191,6 @@ case "$1" in
     echo see file rstudio_session.log for Rstudio IP address and port
     tail -f rstudio_session.log
 
-    exit 1
+    exit 0
     ;;
 esac
