@@ -8,8 +8,8 @@ If you are a new farm user, please consider reading first [HGI's software docume
 
 
 # run the `./rstudio_bsub.sh` script to start rstudio, then copy-paste the URL and passowrd in your web browser for access.
-
-all script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):parameters 
+  
+All script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):parameters 
 
 ```
 ./rstudio_bsub.sh help
