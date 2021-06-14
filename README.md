@@ -17,7 +17,7 @@ All script arguments listed below are optional (the script will attempt to find 
 ./rstudio_bsub.sh help
 Usage: ./rstudio_bsub.sh [options...]
 
-  -l, --lsf_group         (optional) LSF group (bsub -G argument)
+  -g, --lsf_group         (optional) LSF group (bsub -G argument)
                           - defaults to $LSB_DEFAULTGROUP if set, or tries to find your group(s) from lsb.users lsf config
   -m, --mem               (optional) RAM memory requested to LSF farm for Rstudio session
                           - enter a value in Mb (i.e. "15000" to get 15Gb)
