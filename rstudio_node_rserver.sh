@@ -277,6 +277,14 @@ case "$1" in
         echo "Error: singularity image not accessible at \"$RSTUDIO_CONTAINER\". Please speficy arguments -dir_singularity and --image_singularity. --dir_singularity should should be a directory containing a --image_singularity image file"
         exit 1
     fi
+    # check that custom R libpath directory exists, if specified as input argument
+    if [ ! -z "${CUSTOM_R_LIBPATH}" ];
+      if [ ! -r "${CUSTOM_R_LIBPATH}" ]
+        then
+          echo "Error: custom library lib path is not readable. Please choose a --r_lib_path (or -l) directory that contain R libraries"
+          exit 1
+      fi
+    fi
     
     #####################
     #####################
