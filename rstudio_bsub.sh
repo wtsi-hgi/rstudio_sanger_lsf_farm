@@ -158,7 +158,6 @@ case "$1" in
 	(echo "Error: the user $UNIX_USER does not seem to be in LSF group $LSF_GROUP according to list ${LSF_CONF} . Contact HGI (hgi@sanger.ac.usk)" && exit 1)
     
 
-
     printf "\n***bsub arguments***"
     printf "\n  \$MEM memory requested: $MEM Mb"
     printf "\n  \$N_CPUS N cpus requested: $N_CPUS"
@@ -171,8 +170,14 @@ case "$1" in
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
     export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-rocker_tidyverse_$R_VERSION.simg}" 
+    
     export CUSTOM_R_LIBPATH="${CUSTOM_R_LIBPATH:-}" # leave empty by default 
-
+    if [ ! -z "${CUSTOM_R_LIBPATH}" ]
+    then
+      export ARG_CUSTOM_R_LIBPATH="--r_lib_path $CUSTOM_R_LIBPATH"
+    else	
+      export ARG_CUSTOM_R_LIBPATH=""	
+    fi
     
     printf "\nstarting bsub... \n"
     bsub -G $LSF_GROUP \
@@ -184,12 +189,11 @@ case "$1" in
 	 -J "bsub rstudio user $UNIX_USER" \
 	 bash rstudio_node_rserver.sh \
 	 --r_version $R_VERSION \
-	 --r_lib_path $CUSTOM_R_LIBPATH \
 	 --cpus $N_CPUS \
 	 --dir_session $SESSION_DIRECTORY \
 	 --dir_singularity $SINGULARITY_CACHE_DIR \
 	 --image_singularity $IMAGE_SINGULARITY \
-	 > rstudio_session.log
+	 $ARG_CUSTOM_R_LIBPATH > rstudio_session.log
     
     echo waiting for LSF job to start... >> rstudio_session.log
     echo finished bsub
