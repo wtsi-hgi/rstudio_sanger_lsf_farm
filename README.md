@@ -1,5 +1,9 @@
 # rstudio_sanger_lsf_farm
+  
 bsub Rstudio server on Sanger LSF farm, with access to `/lustre`, to be accessed via web browser
+
+If you are a new farm user, please consider first setting HGI's software profile to set your personal  R user library search path, and read the HGI documentation  for instructions on how to install your own libraries.
+- https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm
 
 ```
 ./rstudio_bsub.sh help
@@ -43,6 +47,3 @@ Usage: ./rstudio_bsub.sh [options...]
                           - (these are built from https://hub.docker.com/r/rocker/tidyverse)
   -h, --help              Display this help message
 ```
-
-#### HGI software documentation:
-- https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm
