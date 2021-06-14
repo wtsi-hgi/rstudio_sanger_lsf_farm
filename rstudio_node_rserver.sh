@@ -11,6 +11,28 @@ set -e # exit when any command fails
 #  - https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm
 
 start_rserver() {
+
+#####################
+#####################
+# Choose R executable to be used by default at container execution:
+export R_CONTAINER_EXECUTABLE=/usr/local/bin/R
+
+# if using R executable from outside the container (Sanger /software ISG install):
+# doesn't work for 4.0.3 ("R build missing --enable-R-shlib"): R_CONTAINER_EXECUTABLE=/software/R-$R_VERSION/bin/R
+# or, if using R executable from the container: R_CONTAINER_EXECUTABLE=/usr/local/bin/R 
+
+# as of June 9th 2021, the 2 official R versions and library paths supported by ISG are: 
+# /software/R-3.6.1/bin/R
+#   with lib path "/software/R-3.6.1/lib/R/library"
+# and, 
+# /software/R-4.0.3/bin/R
+#   with lib path "/software/R-4.0.3/lib/R/library"
+#####################
+#####################
+
+# add latest singularity exec to PATH:
+export PATH=/software/singularity-v3.6.4/bin:$PATH
+    
     
 # set .libPaths() for container R session:
 if [ -z "$R_LIBS_USER" ]
@@ -27,7 +49,7 @@ else
 	export CONTAINER_R_LIBS_USER=${R_LIBS_USER}:/software/R-$R_VERSION/lib/R/library
     fi   
 fi
-echo "therefore, CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
+echo "CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
 
 
 # Create temporary directory to be populated with directories to bind-mount in the container
@@ -286,27 +308,6 @@ case "$1" in
             exit 1
         fi
     fi
-    
-    #####################
-    #####################
-    # Choose R executable to be used by default at container execution:
-    export R_CONTAINER_EXECUTABLE=/usr/local/bin/R
-    
-    # if using R executable from outside the container (Sanger /software ISG install):
-    # doesn't work for 4.0.3 ("R build missing --enable-R-shlib"): R_CONTAINER_EXECUTABLE=/software/R-$R_VERSION/bin/R
-    # or, if using R executable from the container: R_CONTAINER_EXECUTABLE=/usr/local/bin/R 
-    
-    # as of June 9th 2021, the 2 official R versions and library paths supported by ISG are: 
-    # /software/R-3.6.1/bin/R
-    #   with lib path "/software/R-3.6.1/lib/R/library"
-    # and, 
-    # /software/R-4.0.3/bin/R
-    #   with lib path "/software/R-4.0.3/lib/R/library"
-    #####################
-    #####################
-    
-    # add latest singularity exec to PATH:
-    export PATH=/software/singularity-v3.6.4/bin:$PATH
     
     #####################
     #####################
