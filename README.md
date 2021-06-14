@@ -1,9 +1,10 @@
 # rstudio_sanger_lsf_farm
   
-bsub Rstudio server on Sanger LSF farm, with access to `/lustre`, to be accessed via web browser
+bsub Rstudio server on Sanger LSF farm, with access to `/lustre`, to be accessed via web browser.
 
-If you are a new farm user, please consider first setting HGI's software profile to set your personal  R user library search path, and read the HGI documentation  for instructions on how to install your own libraries.
-- https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm
+If you are a new farm user, please consider first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
+- set HGI's software profile in order to set your personal R user library search path
+- instructions on how to install your own libraries in that personal directory.
 
 ```
 ./rstudio_bsub.sh help
