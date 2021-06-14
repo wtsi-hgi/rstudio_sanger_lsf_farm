@@ -53,6 +53,7 @@ if [ ! -z "${CUSTOM_R_LIBPATH}" ]
   then
     export CONTAINER_R_LIBS_USER=${CUSTOM_R_LIBPATH}:${CONTAINER_R_LIBS_USER}
 fi
+export SINGULARITYENV_CONTAINER_R_LIBS_USER="${CONTAINER_R_LIBS_USER}"
 echo "CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
 
 # Create temporary directory to be populated with directories to bind-mount in the container
