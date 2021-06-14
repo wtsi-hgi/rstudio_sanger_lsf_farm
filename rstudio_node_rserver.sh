@@ -228,6 +228,7 @@ case "$1" in
   *)
     # set default values if arguments not provided:
     export R_VERSION="${R_VERSION:-4.0.3}"  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
+    export CUSTOM_R_LIBPATH="${CUSTOM_R_LIBPATH:-}" # leave empty by default 
     export N_CPUS="${N_CPUS:-1}" # must match number of CPUs requested by bsub
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
@@ -240,6 +241,7 @@ case "$1" in
     echo N_CPUS set to $N_CPUS
     echo SESSION_DIRECTORY set to $SESSION_DIRECTORY
     echo R_VERSION set to $R_VERSION
+    echo CUSTOM_R_LIBPATH set to $CUSTOM_R_LIBPATH
     echo SINGULARITY_CACHE_DIR set to $SINGULARITY_CACHE_DIR
     echo RSTUDIO_CONTAINER set to $RSTUDIO_CONTAINER
 
