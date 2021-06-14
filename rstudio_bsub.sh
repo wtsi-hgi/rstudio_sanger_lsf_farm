@@ -184,6 +184,7 @@ case "$1" in
 	 -J "bsub rstudio user $UNIX_USER" \
 	 bash rstudio_node_rserver.sh \
 	 --r_version $R_VERSION \
+	 --r_lib_path $CUSTOM_R_LIBPATH \
 	 --cpus $N_CPUS \
 	 --dir_session $SESSION_DIRECTORY \
 	 --dir_singularity $SINGULARITY_CACHE_DIR \
