@@ -1,4 +1,4 @@
-# rstudio_sanger_lsf_farm
+# Rstudio server on Sanger LSF farm
   
 Bash script to start (bsub) an Rstudio server on Sanger LSF farm, with access to `/lustre`, `/nfs` and `/software`.
 
