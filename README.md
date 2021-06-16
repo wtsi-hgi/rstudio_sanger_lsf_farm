@@ -4,7 +4,7 @@ This repository provides a bash script to start (bsub) an Rstudio server on the 
 
 If you are a new farm user, please consider reading first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
 - set HGI's software profile in order to set your personal default R user library search path (`echo "hgi" >> ~/.softwarerc`).
-- get instructions on how to install your own libraries in that personal directory (you can load external libraries in Rstudio, e.g. from `/software/GROUP/USER/R/PLATFORM/VERSION`, but these need to be installed from the farm prior to starting the Rstudio server.
+- get [instructions on how to install your own libraries](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm#SoftwareontheFarm-CustomRLibraries) in that personal directory (you can load external libraries in Rstudio, e.g. from `/software/GROUP/USER/R/PLATFORM/VERSION`, but these need to be installed from the farm prior to starting the Rstudio server.
 
 
 #### start Rstudio
