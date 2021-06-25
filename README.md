@@ -38,8 +38,8 @@ Usage: ./rstudio_bsub.sh [options...]
                           - if Rstudio fails to recover a session in that directory, either:
                               1) remove its session files (i.e any .rstudio, .config, .local, .RData, and .Rhistory)
                               or 2) choose a different --dir_session directory free of any session files.
-  -r, --r_version         (optional) R version: must be either "4.0.3" or "3.6.1"
-                          - defaults to "4.0.3"
+  -r, --r_version         (optional) R version: must be either "4.1.0" or "4.0.3" or "3.6.1"
+                          - defaults to "4.1.0"
                           - contact HGI to add support for other R versions
   -l, --r_lib_path        (optional) path to R library path. Must be compatible with --r_version
                           - the default session .libPaths() will include: 
