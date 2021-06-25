@@ -21,12 +21,15 @@ export R_CONTAINER_EXECUTABLE=/usr/local/bin/R
 # doesn't work for 4.0.3 ("R build missing --enable-R-shlib"): R_CONTAINER_EXECUTABLE=/software/R-$R_VERSION/bin/R
 # or, if using R executable from the container: R_CONTAINER_EXECUTABLE=/usr/local/bin/R 
 
-# as of June 9th 2021, the 2 official R versions and library paths supported by ISG are: 
+# as of June 24th 2021, the 3 official R versions and library paths supported by ISG are: 
 # /software/R-3.6.1/bin/R
 #   with lib path "/software/R-3.6.1/lib/R/library"
 # and, 
 # /software/R-4.0.3/bin/R
 #   with lib path "/software/R-4.0.3/lib/R/library"
+# and, 
+# /software/R-4.1.0/bin/R
+#   with lib path "/software/R-4.1.0/lib/R/library"
 #####################
 #####################
 
@@ -172,8 +175,8 @@ display_help() {
     echo "                          - if Rstudio fails to recover a session in that directory, either:" 
     echo "                              1) remove its session files (i.e any .rstudio, .config, .local, .RData, and .Rhistory)"
     echo "                              or 2) choose a different --dir_session directory free of any session files."
-    echo "  -r, --r_version         (optional) R version: must be either \"4.0.3\" or \"3.6.1\""
-    echo "                          - defaults to \"4.0.3\""
+    echo "  -r, --r_version         (optional) R version: must be either \"4.1.0\" or \"4.0.3\" or \"3.6.1\""
+    echo "                          - defaults to \"4.1.0\""
     echo "                          - contact HGI to add support for other R versions"
     echo "  -l, --r_lib_path        (optional) path to R library path. Must be compatible with --r_version" 
     echo "                          - the default session .libPaths() will include: "
@@ -185,7 +188,7 @@ display_help() {
     echo "                          - defaults to \"/software/hgi/containers\""
     echo "  -i, --image_singularity filename of the singularity image"
     echo "                          - defaults to \"rocker_tidyverse_\${R_VERSION}.simg\""
-    echo "                          - e.g. \"rocker_tidyverse_4.0.3.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
+    echo "                          - e.g. \"rocker_tidyverse_4.1.0.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
     echo "                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)"
     echo "  -c, --cpus              (optional) max number of CPUs allowed for the Rstudio session"
     echo "                          - do not set higher than N cpus requested to LSF farm (bsub -n argument)"
@@ -205,7 +208,7 @@ do
           exit 1 
           ;;
       -r | --r_version)
-          export R_VERSION=$2  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
+          export R_VERSION=$2  # as of June 24th 2021, 4.1.0, 4.0.3 and 3.6.1 were manually pulled from dockerhub to /software/hgi/containers/
           shift 2
           ;;
       -c | --cpus)
@@ -253,7 +256,7 @@ case "$1" in
     ;;
   *)
     # set default values if arguments not provided:
-    export R_VERSION="${R_VERSION:-4.0.3}"  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
+    export R_VERSION="${R_VERSION:-4.1.0}"  # as of June 24th 2021, 4.1.0, 4.0.3 and 3.6.1 were manually pulled from dockerhub to /software/hgi/containers/
     export CUSTOM_R_LIBPATH="${CUSTOM_R_LIBPATH:-}" # leave empty by default 
     export N_CPUS="${N_CPUS:-1}" # must match number of CPUs requested by bsub
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
@@ -275,8 +278,8 @@ case "$1" in
     #####################
     # pre-run checks:
     # check supported R studio versions
-    if [[ ! "$R_VERSION" =~ ^(3.6.1|4.0.3)$ ]]; then
-      echo "Error: R version --r_version (or -r) must be set to either \"4.0.3\" or \"3.6.1\""
+    if [[ ! "$R_VERSION" =~ ^(3.6.1|4.0.3|4.1.0)$ ]]; then
+      echo "Error: R version --r_version (or -r) must be set to either \"4.1.0\" or \"4.0.3\" or \"3.6.1\""
       echo "       contact HGI to add support for other R versions"
       exit 1
     fi

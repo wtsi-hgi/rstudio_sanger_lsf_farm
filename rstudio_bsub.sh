@@ -31,8 +31,8 @@ display_help() {
     echo "                          - if Rstudio fails to recover a session in that directory, either:" 
     echo "                              1) remove its session files (i.e any .rstudio, .config, .local, .RData, and .Rhistory)"
     echo "                              or 2) choose a different --dir_session directory free of any session files."
-    echo "  -r, --r_version         (optional) R version: must be either \"4.0.3\" or \"3.6.1\""
-    echo "                          - defaults to \"4.0.3\""
+    echo "  -r, --r_version         (optional) R version: must be either\"4.1.0\" or \"4.0.3\" or \"3.6.1\""
+    echo "                          - defaults to \"4.1.0\""
     echo "                          - contact HGI to add support for other R versions"
     echo "  -l, --r_lib_path        (optional) path to R library path. Must be compatible with --r_version" 
     echo "                          - the default session .libPaths() will include: "
@@ -44,7 +44,7 @@ display_help() {
     echo "                          - defaults to \"/software/hgi/containers\""
     echo "  -i, --image_singularity filename of the singularity image (image must be in --dir_singularity)"
     echo "                          - defaults to \"rocker_tidyverse_\${R_VERSION}.simg\""
-    echo "                          - e.g. \"rocker_tidyverse_4.0.3.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
+    echo "                          - e.g. \"rocker_tidyverse_4.1.0.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
     echo "                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)"
     echo "  -h, --help              Display this help message "
     echo
@@ -78,7 +78,7 @@ do
           shift 2
           ;;
       -r | --r_version)
-          export R_VERSION=$2  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
+          export R_VERSION=$2  # as of June 24th 2021, 4.1.0 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
           shift 2
           ;;
       -l | --r_lib_path)
@@ -166,7 +166,7 @@ case "$1" in
     printf "\n****** \n"
     
     # set default values for start_rstudio_server.sh script:
-    export R_VERSION="${R_VERSION:-4.0.3}"  # as of June 9th 2021, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
+    export R_VERSION="${R_VERSION:-4.1.0}"  # as of June 24th 2021, 4.1.0, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
     export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-rocker_tidyverse_$R_VERSION.simg}" 
