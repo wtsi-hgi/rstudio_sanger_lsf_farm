@@ -106,7 +106,7 @@ done
 
 # bind chosen work directory as default rstudio session directory
 # also bind Sanger farm /lustre, /software and /nfs 
-export SINGULARITY_BIND="$SESSION_DIRECTORY:$SESSION_DIRECTORY,$SESSION_DIRECTORY:/home/rstudio,/software:/software,/lustre:/lustre,/nfs:/nfs,${workdir}/run:/run,${workdir}/tmp:/tmp,${workdir}/database.conf:/etc/rstudio/database.conf,${workdir}/rsession.sh:/etc/rstudio/rsession.sh,${workdir}/var/lib/rstudio-server:/var/lib/rstudio-server"
+export SINGULARITY_BIND="$SESSION_DIRECTORY,$SESSION_DIRECTORY:/home/rstudio,/software,/lustre,/nfs,${workdir}/run:/run,${workdir}/tmp:/tmp,${workdir}/database.conf:/etc/rstudio/database.conf,${workdir}/rsession.sh:/etc/rstudio/rsession.sh,${workdir}/var/lib/rstudio-server:/var/lib/rstudio-server,/usr/lib/x86_64-linux-gnu:/var/lib/x86_64-linux-gnu:ro"
 
 ## remove argument to 'rserver' that fails on R 3.6.1 container:
 if [ $R_VERSION = "3.6.1" ]; then
@@ -156,6 +156,7 @@ singularity exec \
 	        --auth-pam-helper-path=pam-helper \
 	        --auth-stay-signed-in-days=30 \
 	        --server-working-dir $SESSION_DIRECTORY \
+	        --rsession-ld-library-path=/var/lib/x86_64-linux-gnu \
 	        --rsession-path=/etc/rstudio/rsession.sh \
 	        --rsession-which-r=$R_CONTAINER_EXECUTABLE $EXTRA_RSERVER_ARGUMENTS
 
