@@ -106,7 +106,22 @@ done
 
 # bind chosen work directory as default rstudio session directory
 # also bind Sanger farm /lustre, /software and /nfs 
-export SINGULARITY_BIND="$SESSION_DIRECTORY,$SESSION_DIRECTORY:/home/rstudio,/software,/lustre,/nfs,${workdir}/run:/run,${workdir}/tmp:/tmp,${workdir}/database.conf:/etc/rstudio/database.conf,${workdir}/rsession.sh:/etc/rstudio/rsession.sh,${workdir}/var/lib/rstudio-server:/var/lib/rstudio-server,/usr/lib/x86_64-linux-gnu:/var/lib/x86_64-linux-gnu:ro"
+# Bind host libraries and font configuration
+declare -a BIND_MOUNTS=(
+  "${SESSION_DIRECTORY}"
+  "${SESSION_DIRECTORY}:/home/rstudio"
+  "${workdir}/run:/run"
+  "${workdir}/tmp:/tmp"
+  "${workdir}/database.conf:/etc/rstudio/database.conf"
+  "${workdir}/rsession.sh:/etc/rstudio/rsession.sh"
+  "${workdir}/var/lib/rstudio-server:/var/lib/rstudio-server"
+  "/usr/lib/x86_64-linux-gnu:/var/lib/x86_64-linux-gnu:ro"
+  "/etc/fonts:/etc/fonts:ro"
+  "/software"
+  "/lustre"
+  "/nfs"
+)
+export SINGULARITY_BIND="$(printf "%s," "${BIND_MOUNTS[@]}")"
 
 ## remove argument to 'rserver' that fails on R 3.6.1 container:
 if [ $R_VERSION = "3.6.1" ]; then
