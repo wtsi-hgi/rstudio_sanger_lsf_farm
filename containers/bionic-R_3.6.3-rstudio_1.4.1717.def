@@ -1,7 +1,7 @@
 Bootstrap: debootstrap
 OSVersion: bionic
 MirrorURL: http://archive.ubuntu.com/ubuntu
-Include: ca-certificates curl software-properties-common gnupg
+Include: ca-certificates curl software-properties-common gnupg locales language-pack-en
 
 %post
   export DEBIAN_FRONTEND=noninteractive
@@ -9,6 +9,8 @@ Include: ca-certificates curl software-properties-common gnupg
   printf "%s\n" >/etc/apt/sources.list \
     "deb http://archive.ubuntu.com/ubuntu bionic main universe" \
     "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/"
+
+  update-locale LANG=en_GB.UTF-8 LC_MESSAGES=POSIX
 
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
   apt update
