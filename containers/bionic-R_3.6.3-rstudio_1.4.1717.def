@@ -1,7 +1,15 @@
 Bootstrap: debootstrap
 OSVersion: bionic
 MirrorURL: http://archive.ubuntu.com/ubuntu
-Include: ca-certificates curl software-properties-common gnupg locales language-pack-en
+Include: ca-certificates curl gnupg locales language-pack-en
+
+%help
+  Containerised RStudio Server
+
+%labels
+  Maintainer  Christopher Harrison <ch12@sanger.ac.uk>
+  R           3.6.3
+  RStudio     1.4.1717
 
 %post
   export DEBIAN_FRONTEND=noninteractive
@@ -33,6 +41,18 @@ Include: ca-certificates curl software-properties-common gnupg locales language-
 	IFS='' read -r password
 	[ "${USER}" = "${1}" ] && [ "${PASSWORD}" = "${password}" ]
 	EOF
-  chmod 0755 /usr/local/bin/pam-helper
+
+  cat >/usr/local/bin/rsession <<-'EOF'
+	#!/usr/bin/env sh
+	export OMP_NUM_THREADS="${CPUS}"
+	export R_LIBS_USER="${CONTAINER_R_LIBPATH}"
+	
+	exec /usr/lib/rstudio-server/bin/rsession "$@"
+	EOF
+
+  chmod 0755 /usr/local/bin/pam-helper usr/local/bin/rsession
 
   unset DEBIAN_FRONTEND
+
+%runscript
+  exec /usr/lib/rstudio-server/bin/rserver "$@"
