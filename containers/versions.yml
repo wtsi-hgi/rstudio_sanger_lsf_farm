@@ -1,0 +1,14 @@
+---
+R:
+  - version: 3.6.1
+    source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/
+
+  - version: 4.0.3
+    source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
+
+  - version: 4.1.0
+    source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
+
+RStudio:
+  - version: 1.4.1717
+    source: https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1717-amd64.deb
