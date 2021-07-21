@@ -41,16 +41,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
 	IFS='' read -r password
 	[ "${USER}" = "${1}" ] && [ "${PASSWORD}" = "${password}" ]
 	EOF
-
-  cat >/usr/local/bin/rsession <<-'EOF'
-	#!/usr/bin/env sh
-	export OMP_NUM_THREADS="${CPUS}"
-	export R_LIBS_USER="${CONTAINER_R_LIBPATH}"
-	
-	exec /usr/lib/rstudio-server/bin/rsession "$@"
-	EOF
-
-  chmod 0755 /usr/local/bin/pam-helper usr/local/bin/rsession
+  chmod 0755 /usr/local/bin/pam-helper
 
   unset DEBIAN_FRONTEND
 
