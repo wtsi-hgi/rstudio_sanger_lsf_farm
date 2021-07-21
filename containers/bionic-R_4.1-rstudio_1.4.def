@@ -1,0 +1,49 @@
+Bootstrap: debootstrap
+OSVersion: bionic
+MirrorURL: http://archive.ubuntu.com/ubuntu
+Include: ca-certificates curl gnupg locales language-pack-en
+
+%help
+  Containerised RStudio Server
+
+%labels
+  Maintainer  Christopher Harrison <ch12@sanger.ac.uk>
+  R           4.1.0
+  RStudio     1.4.1717
+
+%post
+  export DEBIAN_FRONTEND=noninteractive
+
+  printf "%s\n" >/etc/apt/sources.list \
+    "deb http://archive.ubuntu.com/ubuntu bionic main universe" \
+    "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/"
+
+  update-locale LANG=en_GB.UTF-8 LC_MESSAGES=POSIX
+
+  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
+  apt update
+
+  curl -o /rstudio.deb https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1717-amd64.deb
+  apt install -y r-base /rstudio.deb
+
+  rm /rstudio.deb
+  apt autoremove
+  apt clean
+
+  cat >/etc/rstudio/database.conf <<-EOF
+	provider=sqlite
+	directory=/var/lib/rstudio-server
+	EOF
+
+  cat >/usr/local/bin/pam-helper <<-'EOF'
+	#!/usr/bin/env sh
+	set -o nounset
+	IFS='' read -r password
+	[ "${USER}" = "${1}" ] && [ "${PASSWORD}" = "${password}" ]
+	EOF
+  chmod 0755 /usr/local/bin/pam-helper
+
+  unset DEBIAN_FRONTEND
+
+%runscript
+  exec /usr/lib/rstudio-server/bin/rserver "$@"
