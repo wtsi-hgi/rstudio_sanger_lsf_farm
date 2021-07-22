@@ -18,8 +18,14 @@
 BUILD   = build
 FORMAT  = sif
 TARGETS = $(shell ./generate-targets.sh)
+IMAGES  = $(TARGETS:%=$(BUILD)/%.$(FORMAT))
 
-all: $(TARGETS:%=$(BUILD)/%.$(FORMAT))
+all: $(IMAGES)
+
+test: $(IMAGES)
+	for IMG in $^; do \
+	  singularity exec "$${IMG}" Rscript -e version; \
+	done
 
 $(BUILD)/%.$(FORMAT): $(BUILD)/%.def | $(BUILD)
 	sudo singularity build "$@" "$^"
@@ -28,9 +34,9 @@ $(BUILD)/%.def: | $(BUILD)
 	./generate-recipe.sh "$*" > "$@"
 
 $(BUILD):
-	mkdir $@
+	mkdir -p "$@"
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf "$(BUILD)"
 
-.PHONY: all clean
+.PHONY: all test clean
