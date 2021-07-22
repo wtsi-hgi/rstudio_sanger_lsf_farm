@@ -1,21 +1,41 @@
 #!/usr/bin/env bash
 
+# Copyright (c) 2021 Genome Research Ltd.
+#
+# Author: Christopher Harrison <ch12@sanger.ac.uk>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
 set -eu
 
-get_source() {
+get_metadata() {
   local software="$1"
-  local version="$2"
+  local name="$2"
+  local attribute="$3"
 
-  yq eval ".${software}[] | select(.version == \"${version}\").source" versions.yml
+  yq eval ".${software}[] | select(.name == \"${name}\").${attribute}" versions.yml
 }
 
 declare TARGET="$1"
 
-declare R_VERSION="$(echo "${TARGET}" | grep -Po "(?<=_R-).+(?=_rstudio)")"
-declare R_SOURCE="$(get_source R "${R_VERSION}")"
+declare R_ID="$(echo "${TARGET}" | grep -Po "(?<=-R_).+(?=-)")"
+declare R_VERSION="$(get_metadata R "${R_ID}" version)"
+declare R_SOURCE="$(get_metadata R "${R_ID}" source)"
 
-declare RSTUDIO_VERSION="$(echo "${TARGET}" | grep -Po "(?<=_rstudio-).+$")"
-declare RSTUDIO_SOURCE="$(get_source RStudio "${RSTUDIO_VERSION}")"
+declare RSTUDIO_ID="$(echo "${TARGET}" | grep -Po "(?<=-rstudio_).+$")"
+declare RSTUDIO_VERSION="$(get_metadata RStudio "${RSTUDIO_ID}" version)"
+declare RSTUDIO_SOURCE="$(get_metadata RStudio "${RSTUDIO_ID}" source)"
 
 cat <<RECIPE
 Bootstrap: debootstrap

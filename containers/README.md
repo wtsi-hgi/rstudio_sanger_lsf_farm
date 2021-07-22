@@ -20,10 +20,10 @@ These images can be made on any Debian-like host on which you have
 
 To build the suite of images, simply run:
 
-    make [IMG_FORMAT=sif]
+    make [FORMAT=sif]
 
 By default, `.sif` images are created. This can be changed by setting
-the `IMG_FORMAT` variable.
+the `FORMAT` variable.
 
 ### Version Suite
 
