@@ -1,15 +1,15 @@
 ---
 R:
   - name: 3.6
-    version: 3.6.1
+    version: 3.6.1-3bionic
     source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran35/
 
   - name: 4.0
-    version: 4.0.3
+    version: 4.0.3-1.1804.0
     source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
 
   - name: 4.1
-    version: 4.1.0
+    version: 4.1.0-1.1804.0
     source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
 
 RStudio:

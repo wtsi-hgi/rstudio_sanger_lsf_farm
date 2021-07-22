@@ -65,7 +65,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
   apt update
 
   curl -o /rstudio.deb ${RSTUDIO_SOURCE}
-  apt install -y r-base=${R_VERSION} /rstudio.deb
+  apt install -y r-base=${R_VERSION} r-recommended=${R_VERSION} /rstudio.deb
 
   rm /rstudio.deb
   apt autoremove
