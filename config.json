@@ -1,0 +1,35 @@
+{
+  "host": {
+    "LSF": "/usr/local/lsf/conf/lsbatch/farm5/configdir/lsb.users",
+    "library": "/usr/lib/x86_64-linux-gnu",
+    "mounts": [
+      "/software",
+      "/lustre",
+      "/nfs"
+    ],
+    "environment": {
+      "http_proxy": "wwwcache.sanger.ac.uk:3128",
+      "https_proxy": "wwwcache.sanger.ac.uk:3128"
+    }
+  },
+  "R": {
+    "default": "4.1",
+    "versions": [
+      {
+        "version": "3.6",
+        "image": "/software/hgi/installs/rstudio-server/containers/bionic-R_3.6-rstudio_1.4.sif",
+        "library": "/software/R-3.6.1/lib/R/library"
+      },
+      {
+        "version": "4.0",
+        "image": "/software/hgi/installs/rstudio-server/containers/bionic-R_4.0-rstudio_1.4.sif",
+        "library": "/software/R-4.0.3/lib/R/library"
+      },
+      {
+        "version": "4.1",
+        "image": "/software/hgi/installs/rstudio-server/containers/bionic-R_4.1-rstudio_1.4.sif",
+        "library": "/software/R-4.1.0/lib/R/library"
+      }
+    ]
+  }
+}

@@ -1,57 +1,99 @@
-### Rstudio server on Sanger LSF farm
-  
-This repository provides a bash script to start (bsub) an Rstudio server on the Sanger LSF farm, with access to `/lustre`, `/nfs` and `/software`, with optional arguments such as R version or R personal library paths.
+# RStudio Server on LSF
 
-If you are a new farm user, please consider reading first [HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm) to:
-- set HGI's software profile in order to set your personal default R user library search path (`echo "hgi" >> ~/.softwarerc`).
-- get [instructions on how to install your own libraries](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm#SoftwareontheFarm-CustomRLibraries) in that personal directory (you can load external libraries in Rstudio, e.g. from `/software/GROUP/USER/R/PLATFORM/VERSION`, but these need to be installed from the farm prior to starting the Rstudio server.
+Submit an RStudio Server session to an LSF cluster.
 
+This is optimised for the Sanger Institute farm, configured with the
+Sanger web proxies, access to `/lustre`, `/nfs` and `/software`, and
+further optional arguments (such as R version or R personal library
+paths).
 
-#### start Rstudio
+If you are a new farm user, please consider reading
+[HGI's software documentation](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm).
+This covers:
 
-Log into the Sanger farm, run the `./rstudio_bsub.sh` script to start Rstudio, and copy-paste the provided URL and password in your web browser for access.
-  
-All script arguments listed below are optional (the script will attempt to find reasonable default values for your Sanger user):
+* Using HGI's software profile in order to set your personal R library
+  search path (`echo "hgi" >> ~/.softwarerc`).
+
+* [Instructions on how to install your own libraries](https://confluence.sanger.ac.uk/display/HGI/Software+on+the+Farm#SoftwareontheFarm-CustomRLibraries)
+  in that personal directory. These can be used in an RStudio Server
+  session, but must be installed from the farm first.
+
+## Usage
+
+From an LSF machine (e.g., a Sanger farm head node), run:
+
+    bsub-rstudio
+
+This will submit the RStudio Server job to the LSF cluster with the
+given arguments, if any, following its output automatically. Note that
+the job may not execute immediately and can take some time to start;
+please be patient. When the job starts, the server will start and you
+will be provided with the URL, username and password, which you can use
+in your browser to access the RStudio Server session.
+
+All script arguments -- listed below -- are optional; the script will
+attempt to find reasonable default values for your Sanger user:
 
 ```
-./rstudio_bsub.sh help
-Usage: ./rstudio_bsub.sh [options...]
+Usage: bsub-rstudio [OPTIONS]
 
-  -g, --lsf_group         (optional) LSF group (bsub -G argument)
-                          - defaults to $LSB_DEFAULTGROUP if set, or tries to find your group(s) from lsb.users lsf config
-  -m, --mem               (optional) RAM memory requested to LSF farm for Rstudio session
-                          - enter a value in Mb (i.e. "15000" to get 15Gb)
-                          - (passed as bsub -M argument)
-                          - defaults to "15000" (i.e. 15Gb)
-  -q, --queue             (optional) LSF queue (bsub -q argument)
-                          - you can list available queues with command 'bqueues'
-                          - you check max runtime (RUNLIMIT) of a given queue with 'bqueues -l a_queue'
-                          - e.g. the "normal" queue jobs last 12 hours max (RUNLIMIT=720 minutes).
-                          - defaults to "normal"
-  -c, --cpus              (optional) max number of CPUs allowed for the Rstudio session
-                          - Number of cpus requested to LSF farm (bsub -n argument)
-                          - defaults to 2
-  -d, --dir_session       (optional) path to startup/default directory for the Rstudio session
-                          - do not set to your home dir $HOME as it may conflict with container settings
-                          - defaults to current directory $PWD
-                          - e.g. "/lustre/scratch123/hgi/projects/ukbb_scrna/pipelines/my_R_analysis"
-                          - if Rstudio fails to recover a session in that directory, either:
-                              1) remove its session files (i.e any .rstudio, .config, .local, .RData, and .Rhistory)
-                              or 2) choose a different --dir_session directory free of any session files.
-  -r, --r_version         (optional) R version: must be either "4.1.0" or "4.0.3" or "3.6.1"
-                          - defaults to "4.1.0"
-                          - contact HGI to add support for other R versions
-  -l, --r_lib_path        (optional) path to R library path. Must be compatible with --r_version
-                          - the default session .libPaths() will include: 
-                              - any path set in env variable $R_LIBS_USER (if set)
-                              - ISG's main libpath "/software/R-${R_VERSION}/lib/R/library"
-                          - e.g. "/software/teamxxx/gn5/R/x86_64-conda_cos6-linux-gnu/4.0.3"
-                          - check or edit manually with command .libPaths() from Rstudio session
-  -a, --dir_singularity   (optional) Directory where singularity image is stored/cached
-                          - defaults to "/software/hgi/containers"
-  -i, --image_singularity filename of the singularity image (image must be in --dir_singularity)
-                          - defaults to "rocker_tidyverse_${R_VERSION}.simg"
-                          - e.g. "rocker_tidyverse_4.0.3.simg" or  "rocker_tidyverse_3.6.1.simg"
-                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)
-  -h, --help              Display this help message
+LSF Options:
+
+  -G  LSF Group
+      * Corresponds to bsub's -G
+      * Default: $LSB_DEFAULTGROUP if set, otherwise tries to find your
+        groups from the LSF configuration and chooses at random
+
+  -M  Memory (in MiB) for the RStudio Server session
+      * Corresponds with bsub's -M
+      * Default: 15000
+
+  -n  Number of CPUs for the RStudio Server session
+      * Corresponds with bsub's -n
+      * Default: 2
+
+  -q  LSF queue
+      * Corresponds with bsub's -q
+      * Default: normal
+
+R Options:
+
+  -R  R version
+      * Defined in configuration (currently 3.6, 4.0 and 4.1)
+      * Contact HGI to add support for other R versions
+      * Default: 4.1 (defined in configuration)
+
+  -d  Session directory
+      * Do not set to your home directory, as this may cause conflicts
+      * If RStudio Server fails to recover the session, either:
+        1. Remove its session files (i.e., any .rstudio, .config,
+           .local, .RData and .Rhistory files)
+        2. Choose a different directory, free of any session files
+      * Default: Current working directory
+
+  -l  R library search paths
+      * Corresponds to R_LIBS_USER environment variable
+      * The library paths must be compatible with the chosen R version
+      * Default: Current R_LIBS_USER and host R library path (defined in
+        configuration)
+
+Miscellaneous Options:
+
+  -C  Configuration JSON file
+      * Default: config.json in installation directory
 ```
+
+### Killing your RStudio Server Job
+
+Once you have finished your RStudio Server session, the following
+command will attempt to automatically identify its LSF job and kill it:
+
+    bkill-rstudio
+
+If you have no, or multiple RStudio Server jobs running, then it will
+refuse to comply. In such cases, manual clean up will be required.
+
+If you only wish to obtain the LSF job ID for your RStudio Server
+session, you can set the `NO_KILL` environment variable:
+
+    NO_KILL=1 bkill-rstudio

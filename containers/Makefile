@@ -28,7 +28,7 @@ test: $(IMAGES)
 	done
 
 $(BUILD)/%.$(FORMAT): $(BUILD)/%.def | $(BUILD)
-	sudo singularity build "$@" "$^"
+	sudo singularity build "$@" "$<"
 
 $(BUILD)/%.def: | $(BUILD)
 	./generate-recipe.sh "$*" > "$@"
