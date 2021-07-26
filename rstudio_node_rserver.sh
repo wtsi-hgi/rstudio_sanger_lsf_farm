@@ -14,13 +14,6 @@ start_rserver() {
 
 #####################
 #####################
-# Choose R executable to be used by default at container execution:
-export R_CONTAINER_EXECUTABLE=/usr/local/bin/R
-
-# if using R executable from outside the container (Sanger /software ISG install):
-# doesn't work for 4.0.3 ("R build missing --enable-R-shlib"): R_CONTAINER_EXECUTABLE=/software/R-$R_VERSION/bin/R
-# or, if using R executable from the container: R_CONTAINER_EXECUTABLE=/usr/local/bin/R 
-
 # as of June 24th 2021, the 3 official R versions and library paths supported by ISG are: 
 # /software/R-3.6.1/bin/R
 #   with lib path "/software/R-3.6.1/lib/R/library"
@@ -64,10 +57,6 @@ echo "CONTAINER_R_LIBS_USER is set to $CONTAINER_R_LIBS_USER"
 workdir="$(mktemp -d)" # workdir=$(python -c 'import tempfile; print(tempfile.mkdtemp())')
 
 mkdir -p -m 700 ${workdir}/run ${workdir}/tmp ${workdir}/var/lib/rstudio-server
-cat > ${workdir}/database.conf <<END
-provider=sqlite
-directory=/var/lib/rstudio-server
-END
 
 # Set OMP_NUM_THREADS to prevent OpenBLAS (and any other OpenMP-enhanced
 # libraries used by R) from spawning more threads than the number of processors
@@ -80,8 +69,10 @@ cat > ${workdir}/rsession.sh <<END
 #!/bin/sh
 export OMP_NUM_THREADS=$N_CPUS
 export R_LIBS_USER=$CONTAINER_R_LIBS_USER
+export http_proxy="wwwcache.sanger.ac.uk:3128"
+export https_proxy="wwwcache.sanger.ac.uk:3128"
 
-exec rsession "\${@}"
+exec /usr/lib/rstudio-server/bin/rsession "\${@}"
 END
 #export R_LIBS_USER=${HOME}/R/rocker-rstudio/4.0
 
@@ -108,15 +99,12 @@ done
 # also bind Sanger farm /lustre, /software and /nfs 
 # Bind host libraries and font configuration
 declare -a BIND_MOUNTS=(
-  "${SESSION_DIRECTORY}"
-  "${SESSION_DIRECTORY}:/home/rstudio"
+  "/usr/lib/x86_64-linux-gnu:/usr/lib/host:ro"
   "${workdir}/run:/run"
   "${workdir}/tmp:/tmp"
-  "${workdir}/database.conf:/etc/rstudio/database.conf"
   "${workdir}/rsession.sh:/etc/rstudio/rsession.sh"
   "${workdir}/var/lib/rstudio-server:/var/lib/rstudio-server"
-  "/usr/lib/x86_64-linux-gnu:/var/lib/x86_64-linux-gnu:ro"
-  "/etc/fonts:/etc/fonts:ro"
+  "${SESSION_DIRECTORY}"
   "/software"
   "/lustre"
   "/nfs"
@@ -165,15 +153,16 @@ singularity exec \
 	    --home $SESSION_DIRECTORY \
 	    --pwd $SESSION_DIRECTORY \
 	    ${RSTUDIO_CONTAINER} \
-	      rserver \
+	      /usr/lib/rstudio-server/bin/rserver \
 	        --www-port ${PORT} \
+	        --www-thread-pool-size=$(( N_CPUS * 2 )) \
 	        --auth-none=0 \
-	        --auth-pam-helper-path=pam-helper \
+	        --auth-pam-helper-path=/usr/local/bin/pam-helper \
 	        --auth-stay-signed-in-days=30 \
-	        --server-working-dir $SESSION_DIRECTORY \
-	        --rsession-ld-library-path=/var/lib/x86_64-linux-gnu \
+	        --server-working-dir=$SESSION_DIRECTORY \
+	        --rsession-ld-library-path=/usr/lib/host \
 	        --rsession-path=/etc/rstudio/rsession.sh \
-	        --rsession-which-r=$R_CONTAINER_EXECUTABLE $EXTRA_RSERVER_ARGUMENTS
+	        $EXTRA_RSERVER_ARGUMENTS
 
 }
 
@@ -203,9 +192,7 @@ display_help() {
     echo "  -a, --dir_singularity   (optional) Directory where singularity image is stored/cached"
     echo "                          - defaults to \"/software/hgi/containers\""
     echo "  -i, --image_singularity filename of the singularity image"
-    echo "                          - defaults to \"rocker_tidyverse_\${R_VERSION}.simg\""
-    echo "                          - e.g. \"rocker_tidyverse_4.1.0.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
-    echo "                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)"
+    echo "                          - defaults to \"bionic-R_\${R_VERSION}-rstudio_1.4.sif\""
     echo "  -c, --cpus              (optional) max number of CPUs allowed for the Rstudio session"
     echo "                          - do not set higher than N cpus requested to LSF farm (bsub -n argument)"
     echo "  -h, --help              Display this help message "
@@ -277,7 +264,7 @@ case "$1" in
     export N_CPUS="${N_CPUS:-1}" # must match number of CPUs requested by bsub
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
-    export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-rocker_tidyverse_$R_VERSION.simg}" 
+    export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-bionic-R_$R_VERSION-rstudio_1.4.sif}" 
     export RSTUDIO_CONTAINER=$SINGULARITY_CACHE_DIR/$IMAGE_SINGULARITY # rocker_tidyverse_$R_VERSION.simg
     # will default to $PWD if empty
     # will be used as both PWD and HOME at container exec 

@@ -43,9 +43,8 @@ display_help() {
     echo "  -a, --dir_singularity   (optional) Directory where singularity image is stored/cached"
     echo "                          - defaults to \"/software/hgi/containers\""
     echo "  -i, --image_singularity filename of the singularity image (image must be in --dir_singularity)"
-    echo "                          - defaults to \"rocker_tidyverse_\${R_VERSION}.simg\""
-    echo "                          - e.g. \"rocker_tidyverse_4.1.0.simg\" or  \"rocker_tidyverse_3.6.1.simg\""
-    echo "                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)"
+    echo "                          - defaults to \"bionic-R_\${R_VERSION}-rstudio_1.4.sif\""
+    echo "                          - e.g. \"bionic-R_4.1.0-rstudio_1.4.sif\" or  \"bionic-R_3.6.1-rstudio_1.4.sif\""
     echo "  -h, --help              Display this help message "
     echo
     exit 1
@@ -169,7 +168,7 @@ case "$1" in
     export R_VERSION="${R_VERSION:-4.1.0}"  # as of June 24th 2021, 4.1.0, 4.0.3 and 3.6.1 were pulled from dockerhub to /software/hgi/containers/
     export SESSION_DIRECTORY="${SESSION_DIRECTORY:-$PWD}"
     export SINGULARITY_CACHE_DIR="${SINGULARITY_CACHE_DIR:-/software/hgi/containers}" #  /software/hgi/containers
-    export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-rocker_tidyverse_$R_VERSION.simg}" 
+    export IMAGE_SINGULARITY="${IMAGE_SINGULARITY:-bionic-R_$R_VERSION-rstudio_1.4.sif}" 
     
     export CUSTOM_R_LIBPATH="${CUSTOM_R_LIBPATH:-}" # leave empty by default 
     if [ ! -z "${CUSTOM_R_LIBPATH}" ]
