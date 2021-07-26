@@ -1,0 +1,314 @@
+#!/usr/bin/env bash
+
+# Copyright (c) 2021 Genome Research Ltd.
+#
+# Authors:
+# * Christopher Harrison <ch12@sanger.ac.uk>
+# * Guillaume Noell <gn5@sanger.ac.uk>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+set -euo pipefail
+
+readonly BINARY="$(readlink -f "$0")"
+readonly ROOT="$(dirname "${BINARY}")"
+
+readonly DEFAULT="_DEFAULT"
+
+stderr() {
+  local message="$*"
+  [[ -t 2 ]] && message="$(tput setaf 1)${message}$(tput sgr0)"
+  >&2 echo "${message}"
+}
+
+usage() {
+  # NOTE Keep this in-sync with README.md
+  cat <<-'EOF'
+	Usage: bsub-rstudio [OPTIONS]
+	
+	LSF Options:
+	
+	  -G  LSF Group
+	      * Corresponds to bsub's -G
+	      * Default: $LSB_DEFAULTGROUP if set, otherwise tries to find your
+	        groups from the LSF configuration and chooses at random
+	
+	  -M  Memory (in MiB) for the RStudio Server session
+	      * Corresponds with bsub's -M
+	      * Default: 15000
+	
+	  -n  Number of CPUs for the RStudio Server session
+	      * Corresponds with bsub's -n
+	      * Default: 2
+	
+	  -q  LSF queue
+	      * Corresponds with bsub's -q
+	      * Default: normal
+	
+	R Options:
+	
+	  -R  R version
+	      * Defined in configuration (currently 3.6, 4.0 and 4.1)
+	      * Contact HGI to add support for other R versions
+	      * Default: 4.1 (defined in configuration)
+	
+	  -d  Session directory
+	      * Do not set to your home directory, as this may cause conflicts
+	      * If RStudio Server fails to recover the session, either:
+	        1. Remove its session files (i.e., any .rstudio, .config,
+	           .local, .RData and .Rhistory files)
+	        2. Choose a different directory, free of any session files
+	      * Default: Current working directory
+	
+	  -l  R library search paths
+	      * Corresponds to R_LIBS_USER environment variable
+	      * The library paths must be compatible with the chosen R version
+	      * Default: Current R_LIBS_USER and host R library path (defined in
+	        configuration)
+	
+	Miscellaneous Options:
+	
+	  -C  Configuration JSON file
+	      * Default: config.json in installation directory
+	EOF
+}
+
+get_config() {
+  local config="$1"
+  local query="$2"
+  jq -r ".${query}" "${config}"
+}
+
+get_lsf_group() {
+  # FIXME Parsing the LSF config like this probably isn't a great idea
+  local lsf_config="$1"
+  local groups
+
+  if ! groups="$(grep -Ev "\s*#" "${lsf_config}" \
+               | grep -E "\(.*\b$(whomai)\b.*\)" \
+               | grep -Eo "^(\w|-)+")"; then
+    return 1
+  fi
+
+  { shuf | head -1; } <<< "${groups}"
+}
+
+get_free_port() {
+  python <<-EOF
+	import socket
+	from contextlib import closing
+	
+	with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+	    s.bind(("", 0))
+	    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+	    print(s.getsockname()[1])
+	EOF
+}
+
+create_working_directory() {
+  local workdir="$(mktemp -d)"
+  mkdir -p "${workdir}/"{lib,run,tmp}
+  echo "${workdir}"
+}
+
+submit_rstudio() {
+  local config="${ROOT}/config.json"
+
+  local lsf_group="${DEFAULT}"
+  local lsf_memory="15000"
+  local lsf_cpus="2"
+  local lsf_queue="normal"
+
+  local r_version="${DEFAULT}"
+  local r_session="$(pwd)"
+  local r_libpath="${DEFAULT}"
+
+  local _opt
+  while getopts "G:M:n:q:R:d:l:C:h" _opt; do
+    case "${_opt}" in
+      "G") lsf_group="${OPTARG}";;
+      "M") lsf_memory="${OPTARG}";;
+      "n") lsf_cpus="${OPTARG}";;
+      "q") lsf_queue="${OPTARG}";;
+      "R") r_version="${OPTARG}";;
+      "d") r_session="${OPTARG}";;
+      "l") r_libpath="${OPTARG}";;
+      "C") config="${OPTARG}";;
+      "h") usage && exit 0;;
+      *)   usage >&2 && exit 1;;
+    esac
+  done
+
+  # Check configuration file exists
+  if ! [[ -e "${config}" ]]; then
+    stderr "Configuration file not found: ${config}"
+    exit 1
+  fi
+
+  # Set defaults from runtime/configuration where necessary
+  # LSF group
+  if [[ "${lsf_group}" = "${DEFAULT}" ]]; then
+    if [[ "${LSB_DEFAULTGROUP+x}" ]]; then
+      lsf_group="${LSB_DEFAULTGROUP}"
+    else
+      if ! lsf_group="$(get_lsf_group "$(get_config "${config}" "host.LSF")")"; then
+        stderr "Cannot deduce any matching LSF group"
+        exit 1
+      fi
+    fi
+  fi
+
+  # R Version
+  [[ "${r_version}" = "${DEFAULT}" ]] && r_version="$(get_config "${config}" "R.default")"
+  local _r_cfg="R.versions[] | select(.version == \"${r_version}\")"
+  if ! [[ "$(get_config "${config}" "${_r_cfg}")" ]]; then
+    stderr "Unknown R version: ${r_version}"
+    exit 1
+  fi
+
+  # R Library Path
+  if [[ "${r_libpath}" = "${DEFAULT}" ]]; then
+    r_libpath="$(get_config "${config}" "${_r_cfg}.library")"
+    [[ "${R_LIBS_USER+x}" ]] && r_libpath="${R_LIBS_USER}:${r_libpath}"
+  fi
+
+  # Sanity-check arguments
+  if [[ "${r_session}" = "${HOME}" ]]; then
+    stderr "The RStudio Server session directory should not be your home directory; please specify an alternative with -d"
+    exit 1
+  fi
+
+  cat <<-EOF
+	RStudio Server LSF Submission
+	
+	LSF Options:
+	* Group:             ${lsf_group}
+	* Queue:             ${lsf_queue}
+	* Memory:            ${lsf_memory} MiB
+	* CPUs:              ${lsf_cpus}
+	
+	R Options:
+	* Version:           ${r_version} ($(get_config "${config}" "${_r_cfg}.image"))
+	* Session Directory: ${r_session}
+	* Library Paths:     ${r_libpath}
+	EOF
+
+  # Set environment variables for downstream job to pick up
+  export RSTUDIO_SUBMIT=1
+  export RSTUDIO_CONFIG="${config}"
+  export RSTUDIO_MEMORY="${lsf_memory}"
+  export RSTUDIO_CPUS="${lsf_cpus}"
+  export RSTUDIO_IMAGE="$(get_config "${config}" "${_r_cfg}.image")"
+  export RSTUDIO_SESSION="${r_session}"
+  export RSTUDIO_LIBPATH="${r_libpath}"
+
+  local _log="${r_session}/rstudio-session.log"
+  echo "Waiting for RStudio Server session to start..." > "${_log}"
+
+  bsub -G "${lsf_group}" \
+       -q "${lsf_queue}" \
+       -M "${lsf_memory}" \
+       -n "${lsf_cpus}" \
+       -R "select[mem>${lsf_memory}] rusage[tmp=5000, mem=${lsf_memory}] span[hosts=1]" \
+       -J "bsub rstudio user $(whoami)" \
+       -o "${_log}" \
+       -e "${_log}" \
+       "${BINARY}"
+
+  tail -f "${_log}"
+}
+
+start_rstudio() {
+  # Ensure all the environment variables we need are set
+  local _env
+  for _env in RSTUDIO_CONFIG RSTUDIO_MEMORY RSTUDIO_CPUS RSTUDIO_IMAGE RSTUDIO_SESSION RSTUDIO_LIBPATH; do
+    if ! [[ ${!_env+x} ]]; then
+      stderr "Invalid session: ${_env} is not set"
+      exit 1
+    fi
+  done
+
+  local workdir="$(create_working_directory)"
+  trap "rm -rf \"${workdir}\"" EXIT
+
+  local host="$(hostname -i)"
+  local port="$(get_free_port)"
+
+  cat >"${workdir}/run/rsession.sh" <<-EOF
+	#!/usr/bin/env sh
+	export OMP_NUM_THREADS="${RSTUDIO_CPUS}"
+	export R_LIBS_USER="${RSTUDIO_LIBPATH}"
+	$(get_config "${RSTUDIO_CONFIG}" 'host.environment | to_entries[] | "export " + .key + "=\"" + .value + "\""')
+	
+	exec /usr/lib/rstudio-server/bin/rsession "\$@"
+	EOF
+  chmod 0755 "${workdir}/run/rsession.sh"
+
+  local -a mounts=(
+    "$(get_config "${RSTUDIO_CONFIG}" "host.library"):/usr/lib/host:ro"
+    "${workdir}/lib:/var/lib/rstudio-server"
+    "${workdir}/run:/var/run/rstudio-server"
+    "${workdir}/tmp:/tmp/rstudio-server"
+    "${RSTUDIO_SESSION}"
+  )
+
+  local _mounts_cfg
+  for _mounts_cfg in $(get_config "${RSTUDIO_CONFIG}" "host.mounts[]"); do
+    mounts+=("${_mounts_cfg}")
+  done
+
+  export SINGULARITY_BIND="$(printf "%s," "${mounts[@]}")"
+
+  export SINGULARITYENV_USER="$(whoami)"
+  export SINGULARITYENV_PASSWORD="$(openssl rand -base64 9)"
+
+  cat <<-EOF
+	Bind mounts:
+	$(printf "* %s\n" "${mounts[@]}")
+	
+	Starting RStudio Server on http://${host}:${port}
+	* Username: ${SINGULARITYENV_USER}
+	* Password: ${SINGULARITYENV_PASSWORD}
+	EOF
+
+  singularity exec \
+    --cleanenv \
+    --containall \
+    --home "${RSTUDIO_SESSION}" \
+    --pwd "${RSTUDIO_SESSION}" \
+    "${RSTUDIO_IMAGE}" \
+    /usr/lib/rstudio-server/bin/rserver \
+      --www-port="${port}" \
+      --www-thread-pool-size=$(( RSTUDIO_CPUS * 2 )) \
+      --auth-none=0 \
+      --auth-timeout-minutes=0 \
+      --auth-stay-signed-in-days=30 \
+      --auth-pam-helper-path=/usr/local/bin/pam-helper \
+      --rsession-path=/var/run/rstudio-server/rsession.sh \
+      --rsession-ld-library-path=/usr/lib/host \
+      --server-working-dir="${RSTUDIO_SESSION}"
+}
+
+main() {
+  if [[ "${RSTUDIO_SUBMIT+x}" ]]; then
+    # If RSTUDIO_SUBMIT is set, then we start the server...
+    start_rstudio
+
+  else
+    # ...otherwise, we submit the server job to LSF
+    submit_rstudio "$@"
+  fi
+}
+
+main "$@"
