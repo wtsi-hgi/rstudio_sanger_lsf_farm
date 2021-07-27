@@ -220,7 +220,7 @@ submit_rstudio() {
   if [[ "${NO_BSUB+x}" ]]; then
     # Start the session on the host machine, rather than submitting it
     # as an LSF job (for debugging)
-    "${BINARY}" | tee "${_log}"
+    "${BINARY}" 2>&1 | tee "${_log}"
 
   else
     bsub -G "${lsf_group}" \
