@@ -96,7 +96,7 @@ get_lsf_group() {
   local groups
 
   if ! groups="$(grep -Ev "\s*#" "${lsf_config}" \
-               | grep -E "\(.*\b$(whomai)\b.*\)" \
+               | grep -E "\(.*\b$(whoami)\b.*\)" \
                | grep -Eo "^(\w|-)+")"; then
     return 1
   fi
@@ -202,6 +202,7 @@ submit_rstudio() {
 	* Version:           ${r_version} ($(get_config "${config}" "${_r_cfg}.image"))
 	* Session Directory: ${r_session}
 	* Library Paths:     ${r_libpath}
+	
 	EOF
 
   # Set environment variables for downstream job to pick up
@@ -216,21 +217,29 @@ submit_rstudio() {
   local _log="${r_session}/rstudio-session.log"
   echo "Waiting for RStudio Server session to start..." > "${_log}"
 
-  bsub -G "${lsf_group}" \
-       -q "${lsf_queue}" \
-       -M "${lsf_memory}" \
-       -n "${lsf_cpus}" \
-       -R "select[mem>${lsf_memory}] rusage[tmp=5000, mem=${lsf_memory}] span[hosts=1]" \
-       -J "bsub rstudio user $(whoami)" \
-       -o "${_log}" \
-       -e "${_log}" \
-       "${BINARY}"
+  if [[ "${NO_BSUB+x}" ]]; then
+    # Start the session on the host machine, rather than submitting it
+    # as an LSF job (for debugging)
+    "${BINARY}" | tee "${_log}"
 
-  tail -f "${_log}"
+  else
+    bsub -G "${lsf_group}" \
+         -q "${lsf_queue}" \
+         -M "${lsf_memory}" \
+         -n "${lsf_cpus}" \
+         -R "select[mem>${lsf_memory}] rusage[tmp=5000, mem=${lsf_memory}] span[hosts=1]" \
+         -J "bsub rstudio user $(whoami)" \
+         -o "${_log}" \
+         -e "${_log}" \
+         "${BINARY}"
+
+    tail -f "${_log}"
+  fi
 }
 
 start_rstudio() {
   # Ensure all the environment variables we need are set
+  # NOTE We expect RSTUDIO_MEMORY but currently don't use it
   local _env
   for _env in RSTUDIO_CONFIG RSTUDIO_MEMORY RSTUDIO_CPUS RSTUDIO_IMAGE RSTUDIO_SESSION RSTUDIO_LIBPATH; do
     if ! [[ ${!_env+x} ]]; then
@@ -274,6 +283,7 @@ start_rstudio() {
   export SINGULARITYENV_PASSWORD="$(openssl rand -base64 9)"
 
   cat <<-EOF
+	
 	Bind mounts:
 	$(printf "* %s\n" "${mounts[@]}")
 	
