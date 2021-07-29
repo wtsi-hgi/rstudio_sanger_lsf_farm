@@ -71,7 +71,11 @@ Include: ca-certificates curl gnupg locales language-pack-en
     r-doc-html=${R_VERSION} \\
     /rstudio.deb
 
+  ln -s /usr/lib/x86_64-linux-gnu/blas/libblas.so.3 /usr/lib/R/lib/libRblas.so
+  ln -s /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3 /usr/lib/R/lib/libRlapack.so
+
   rm /rstudio.deb
+  apt remove -y gnupg
   apt autoremove
   apt clean
 
