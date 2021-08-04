@@ -258,7 +258,7 @@ start_rstudio() {
 	#!/usr/bin/env sh
 	export OMP_NUM_THREADS="${RSTUDIO_CPUS}"
 	export R_LIBS_USER="${RSTUDIO_LIBPATH}"
-	$(get_config "${RSTUDIO_CONFIG}" 'host.environment | to_entries[] | "export " + .key + "=\"" + .value + "\""')
+	$(get_config "${RSTUDIO_CONFIG}" 'host.environment | to_entries[] | @sh "export \(.key)=\(.value)"')
 	
 	exec /usr/lib/rstudio-server/bin/rsession "\$@"
 	EOF
