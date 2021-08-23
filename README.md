@@ -38,7 +38,7 @@ Usage: ./rstudio_bsub.sh [options...]
                           - if Rstudio fails to recover a session in that directory, either:
                               1) remove its session files (i.e any .rstudio, .config, .local, .RData, and .Rhistory)
                               or 2) choose a different --dir_session directory free of any session files.
-  -r, --r_version         (optional) R version: must be either "4.1.0" or "4.0.3" or "3.6.1"
+  -r, --r_version         (optional) R version: must be either"4.1.0" or "4.0.3" or "3.6.1"
                           - defaults to "4.1.0"
                           - contact HGI to add support for other R versions
   -l, --r_lib_path        (optional) path to R library path. Must be compatible with --r_version
@@ -50,8 +50,7 @@ Usage: ./rstudio_bsub.sh [options...]
   -a, --dir_singularity   (optional) Directory where singularity image is stored/cached
                           - defaults to "/software/hgi/containers"
   -i, --image_singularity filename of the singularity image (image must be in --dir_singularity)
-                          - defaults to "rocker_tidyverse_${R_VERSION}.simg"
-                          - e.g. "rocker_tidyverse_4.0.3.simg" or  "rocker_tidyverse_3.6.1.simg"
-                          - (these are built from https://hub.docker.com/r/rocker/tidyverse)
+                          - defaults to "bionic-R_${R_VERSION}-rstudio_1.4.sif"
+                          - e.g. "bionic-R_4.1.0-rstudio_1.4.sif" or  "bionic-R_3.6.1-rstudio_1.4.sif"
   -h, --help              Display this help message
 ```
