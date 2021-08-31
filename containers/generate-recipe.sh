@@ -56,6 +56,9 @@ Include: ca-certificates curl gnupg locales language-pack-en
 
   cat >/etc/apt/sources.list <<-EOF
 	deb http://archive.ubuntu.com/ubuntu bionic main universe
+	deb http://archive.ubuntu.com/ubuntu bionic-updates main universe
+	deb http://archive.ubuntu.com/ubuntu bionic-backports main universe
+	deb http://archive.ubuntu.com/ubuntu bionic-security main universe
 	deb ${R_SOURCE}
 	EOF
 
@@ -63,7 +66,13 @@ Include: ca-certificates curl gnupg locales language-pack-en
 
   apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
   apt update
+  apt upgrade -y
 
+  # Minimal command line tools
+  apt install -y --no-install-recommends \\
+    grep less sed gawk gzip tar coreutils jq man-db
+
+  # R and RStudio
   curl -o /rstudio.deb ${RSTUDIO_SOURCE}
   apt install -y --no-install-recommends \\
     r-base-core=${R_VERSION} \\
@@ -71,6 +80,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
     r-doc-html=${R_VERSION} \\
     /rstudio.deb
 
+  # Symlink system BLAS and LAPACK for R
   ln -s /usr/lib/x86_64-linux-gnu/blas/libblas.so.3 /usr/lib/R/lib/libRblas.so
   ln -s /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3 /usr/lib/R/lib/libRlapack.so
 
