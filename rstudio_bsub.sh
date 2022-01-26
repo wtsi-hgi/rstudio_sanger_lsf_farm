@@ -180,7 +180,7 @@ case "$1" in
     
     printf "\nstarting bsub... \n"
     bsub -G $LSF_GROUP \
-	 -R "select[model==Intel_Platinum && mem>$MEM] rusage[tmp=5000 && mem=$MEM] span[hosts=1]" \
+	 -R "select[model==Intel_Platinum && mem>$MEM] rusage[tmp=5000, mem=$MEM] span[hosts=1]" \
 	 -M $MEM -n $N_CPUS \
 	 -o rstudio_session.log \
 	 -e rstudio_session.log \
