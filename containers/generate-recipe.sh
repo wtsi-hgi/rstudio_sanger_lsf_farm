@@ -67,6 +67,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
   curl -o /rstudio.deb ${RSTUDIO_SOURCE}
   apt install -y --no-install-recommends \\
     git wget git-lsf \\
+    make g++ \\
     r-base-core=${R_VERSION} \\
     r-base-html=${R_VERSION} \\
     r-doc-html=${R_VERSION} \\
