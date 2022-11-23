@@ -12,7 +12,15 @@ R:
     version: 4.1.0-1.1804.0
     source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
 
+  - name: 4.2
+    version: 4.2.2-1.1804.0
+    source: https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/
+
 RStudio:
   - name: 1.4
     version: 1.4.1717
     source: https://download2.rstudio.org/server/bionic/amd64/rstudio-server-1.4.1717-amd64.deb
+
+  - name: 2022.07.2
+    version: 2022.07.2+576
+    source: https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2022.07.2-576-amd64.deb
