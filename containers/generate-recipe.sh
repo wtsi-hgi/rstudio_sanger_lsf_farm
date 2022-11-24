@@ -66,13 +66,14 @@ Include: ca-certificates curl gnupg locales language-pack-en
 
   curl -o /rstudio.deb ${RSTUDIO_SOURCE}
   apt install -y --no-install-recommends \\
-    git wget git-lsf \\
+    git wget \\
     make g++ \\
     r-base-core=${R_VERSION} \\
     r-base-html=${R_VERSION} \\
     r-doc-html=${R_VERSION} \\
     /rstudio.deb
 
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
   rm /rstudio.deb
   apt autoremove
   apt clean
