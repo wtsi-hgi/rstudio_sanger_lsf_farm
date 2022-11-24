@@ -162,6 +162,7 @@ singularity exec \
 	        --server-working-dir=$SESSION_DIRECTORY \
 	        --rsession-ld-library-path=/usr/lib/host \
 	        --rsession-path=/etc/rstudio/rsession.sh \
+	        --server-user $SINGULARITYENV_USER \
 	        $EXTRA_RSERVER_ARGUMENTS
 
 }
@@ -281,7 +282,7 @@ case "$1" in
     #####################
     # pre-run checks:
     # check supported R studio versions
-    if [[ ! "$R_VERSION" =~ ^(3.6.1|4.0.3|4.1.0|4.1.3)$ ]]; then
+    if [[ ! "$R_VERSION" =~ ^(3.6.1|4.0.3|4.1.0|4.1.3|4.2.2)$ ]]; then
       echo "Error: R version --r_version (or -r) must be set to either \"4.1.0\" or \"4.0.3\" or \"3.6.1\""
       echo "       contact HGI to add support for other R versions"
       exit 1
@@ -306,7 +307,7 @@ case "$1" in
     fi
     if [ ! -r "$RSTUDIO_CONTAINER" ]
       then
-        echo "Error: singularity image not accessible at \"$RSTUDIO_CONTAINER\". Please speficy arguments -dir_singularity and --image_singularity. --dir_singularity should should be a directory containing a --image_singularity image file"
+        echo "Error: singularity image not accessible at \"$RSTUDIO_CONTAINER\". Please speficy arguments --dir_singularity and --image_singularity. --dir_singularity should be a directory containing a --image_singularity image file"
         exit 1
     fi
     # check that custom R libpath directory exists, if specified as input argument
