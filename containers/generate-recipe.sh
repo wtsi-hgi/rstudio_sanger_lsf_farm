@@ -92,6 +92,9 @@ Include: ca-certificates curl gnupg locales language-pack-en
 	EOF
   chmod 0755 /usr/local/bin/pam-helper
 
+  echo "/software/R-${R_ID}/lib/R/lib" > /etc/ld.so.conf.d/libR.conf
+  ldconfig
+
   unset DEBIAN_FRONTEND
 
 %runscript
