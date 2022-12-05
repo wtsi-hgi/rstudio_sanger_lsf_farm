@@ -69,6 +69,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
     git wget \\
     make g++ \\
     r-base-core=${R_VERSION} \\
+    r-base-dev=${R_VERSION} \\
     r-base-html=${R_VERSION} \\
     r-doc-html=${R_VERSION} \\
     /rstudio.deb
