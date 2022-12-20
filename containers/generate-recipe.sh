@@ -69,7 +69,6 @@ Include: ca-certificates curl gnupg locales language-pack-en
     git wget \\
     make g++ \\
     r-base-core=${R_VERSION} \\
-    r-base-dev=${R_VERSION} \\
     r-base-html=${R_VERSION} \\
     r-doc-html=${R_VERSION} \\
     /rstudio.deb
@@ -91,9 +90,6 @@ Include: ca-certificates curl gnupg locales language-pack-en
 	[ "\${USER}" = "\$1" ] && [ "\${PASSWORD}" = "\${password}" ]
 	EOF
   chmod 0755 /usr/local/bin/pam-helper
-
-  echo "/software/R-${R_ID}/lib/R/lib" > /etc/ld.so.conf.d/libR.conf
-  ldconfig
 
   unset DEBIAN_FRONTEND
 
