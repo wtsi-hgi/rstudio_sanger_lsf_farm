@@ -93,6 +93,7 @@ Include: ca-certificates curl gnupg locales language-pack-en
 
   # link liblapack (otherwise some packages wouldn't be able to be loaded)
   ln -s /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3 /usr/lib/R/lib/libRlapack.so
+  ln -s /usr/lib/x86_64-linux-gnu/blas/libblas.so.3 /usr/lib/R/lib/libRblas.so
 
   unset DEBIAN_FRONTEND
 
