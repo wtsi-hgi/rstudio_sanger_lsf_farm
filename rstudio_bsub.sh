@@ -142,12 +142,19 @@ case "$1" in
         if test -z "$LSB_DEFAULTGROUP" 
           then
             echo "\$LSB_DEFAULTGROUP is empty"
-	    # because LSF_GROUP not specified, and $LSB_DEFAULTGROUP is empty, assign random group from lsf conf file  
-	    export LSF_GROUP=$(cat $LSF_CONF | grep $UNIX_USER | grep default | grep -v '^#' | head -n 1 |cut -f1 -d " ")
-	    echo "assigning random lsf group for user $UNIX_USER from lsf config file $LSF_CONF : $LSF_GROUP"
+            if test -z "$LSB_DEFAULT_USERGROUP"
+              then
+                echo "\$LSB_DEFAULT_USERGROUP is empty"
+                # because LSF_GROUP not specified, and $LSB_DEFAULTGROUP/$LSB_DEFAULT_USERGROUP is empty, assign random group from lsf conf file
+                export LSF_GROUP=$(cat $LSF_CONF | grep $UNIX_USER | grep default | grep -v '^#' | head -n 1 |cut -f1 -d " ")
+                echo "assigning random lsf group for user $UNIX_USER from lsf config file $LSF_CONF : $LSF_GROUP"
+              else
+                echo "\$LSB_DEFAULT_USERGROUP not empty, therefore setting \$LSF_GROUP to \$LSB_DEFAULT_USERGROUP"
+                export LSF_GROUP=$LSB_DEFAULT_USERGROUP
+            fi
           else
             echo "\$LSB_DEFAULTGROUP not empty, therefore setting \$LSF_GROUP to \$LSB_DEFAULTGROUP"
-	    export LSF_GROUP=$LSB_DEFAULTGROUP
+            export LSF_GROUP=$LSB_DEFAULTGROUP
         fi
     fi
     echo LSF_GROUP is $LSF_GROUP
