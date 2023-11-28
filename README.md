@@ -1,3 +1,7 @@
+## Deprecated
+
+This repo is now deprecated in favour of the [RStudio Module](https://hgi-projects.pages.internal.sanger.ac.uk/documentation/docs/how-to-guides/rstudio/).
+
 ### Rstudio server on Sanger LSF farm
   
 This repository provides a bash script to start (bsub) an Rstudio server on the Sanger LSF farm, with access to `/lustre`, `/nfs` and `/software`, with optional arguments such as R version or R personal library paths.
